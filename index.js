@@ -1,30 +1,34 @@
 require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-var bodyParser = require("body-parser");
-var cors = require("cors");
+const express = require("express");   //import express package
+const mongoose = require("mongoose");  // import mngoose package
+var bodyParser = require("body-parser");  // import body-parser package
+var cors = require("cors");  // import cors package
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 const port = process.env.PORT;
 
+//connect to mongodb
 mongoose.connect("mongodb://localhost:27017/CRUD", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+//check mongodb  connect or not 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
 });
 
+//create schema 
 const AddSchema = new mongoose.Schema({
   title: String,
   description: String,
 });
-
+//create schema model
 const Add = mongoose.model("Add", AddSchema);
+
 
 app.get("/", (req, res) => {
   res.send("Hello World from backend server!");
@@ -65,7 +69,9 @@ app.post("/client", (req, res) => {
   });
 });
 
-// Crud operation api listing here
+/**  Crud operation api listing here **/
+
+//add Todo POST Method Api
 app.post("/add", (req, res) => {
   console.log("server", req.body);
   const add = new Add({
@@ -84,7 +90,7 @@ app.post("/add", (req, res) => {
   });
 });
 
-//list todo api
+//listing all todo GET Method Api
 app.get("/todolist", async (req, res) => {
   const todos = await Add.find();
   if (todos) {
@@ -94,7 +100,7 @@ app.get("/todolist", async (req, res) => {
   }
 });
 
-//delete todo api
+//delete todo Api
 app.delete("/delete/:id", (req, res) => {
   const id = req.params.id;
   Add.deleteOne({ _id: id }, (error, data) => {
@@ -111,7 +117,7 @@ app.delete("/delete/:id", (req, res) => {
   });
 });
 
-//get single todo by id api
+//get single todo item by id Api
 app.get("/todolist/:id", (req, res) => {
   const id = req.params.id;
   Add.findOne({ _id: id }, (error, data) => {
@@ -125,7 +131,7 @@ app.get("/todolist/:id", (req, res) => {
   });
 });
 
-//edit todo api
+//edit todo Api
 app.patch("/edit/:id", (req, res) => {
   const id = req.params.id;
   // res.send(req.body);
@@ -138,6 +144,8 @@ app.patch("/edit/:id", (req, res) => {
   });
 });
 
+
+//server listen on browser for below port i.e htttp://localhost:4000
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
